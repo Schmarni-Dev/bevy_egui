@@ -3,6 +3,7 @@ use crate::{
     EguiManagedTextures, EguiSettings, EguiUserTextures, WindowSize,
 };
 use bevy::{
+    asset::HandleId,
     ecs::system::SystemParam,
     prelude::*,
     render::{
