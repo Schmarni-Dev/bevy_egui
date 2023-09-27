@@ -24,7 +24,6 @@ use bevy::{
 /// Extracted Egui settings.
 #[derive(Resource, Deref, DerefMut, Default)]
 pub struct ExtractedEguiSettings(pub EguiSettings);
-
 /// The extracted version of [`EguiManagedTextures`].
 #[derive(Debug, Resource)]
 pub struct ExtractedEguiManagedTextures(pub HashMap<(Entity, u64), Handle<Image>>);

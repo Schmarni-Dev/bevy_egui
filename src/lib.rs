@@ -590,7 +590,10 @@ impl Plugin for EguiPlugin {
         app.add_plugins(ExtractResourcePlugin::<EguiSettings>::default());
         app.add_plugins(ExtractResourcePlugin::<EguiUserTextures>::default());
         app.add_plugins(ExtractResourcePlugin::<ExtractedEguiManagedTextures>::default());
+<<<<<<< HEAD
         app.add_plugins(ExtractComponentPlugin::<EguiRenderToTexture>::default());
+=======
+>>>>>>> 2ae5fcf (Use ExtractResource trait for EguiManagedTextures and EguiUserTextures)
         app.add_plugins(ExtractComponentPlugin::<EguiContext>::default());
         app.add_plugins(ExtractComponentPlugin::<WindowSize>::default());
         app.add_plugins(ExtractComponentPlugin::<EguiRenderOutput>::default());
