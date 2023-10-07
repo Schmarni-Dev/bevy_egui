@@ -581,6 +581,8 @@ impl Plugin for EguiPlugin {
         world.init_resource::<EguiUserTextures>();
         world.init_resource::<EguiMousePosition>();
         world.insert_resource(TouchId::default());
+        app.add_plugins(ExtractResourcePlugin::<EguiUserTextures>::default());
+        app.add_plugins(ExtractResourcePlugin::<ExtractedEguiManagedTextures>::default());
         app.add_plugins(ExtractResourcePlugin::<EguiSettings>::default());
         app.add_plugins(ExtractResourcePlugin::<EguiUserTextures>::default());
         app.add_plugins(ExtractResourcePlugin::<ExtractedEguiManagedTextures>::default());
