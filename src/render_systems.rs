@@ -3,7 +3,6 @@ use crate::{
     EguiManagedTextures, EguiSettings, EguiUserTextures, WindowSize,
 };
 use bevy::{
-    asset::HandleId,
     ecs::system::SystemParam,
     prelude::*,
     render::{
@@ -11,9 +10,8 @@ use bevy::{
         render_asset::RenderAssets,
         render_graph::RenderGraph,
         render_resource::{
-            BindGroup, BindGroupDescriptor, BindGroupEntry, BindingResource, BufferId,
-            CachedRenderPipelineId, DynamicUniformBuffer, PipelineCache, ShaderType,
-            SpecializedRenderPipelines,
+            BindGroup, BindGroupEntry, BindingResource, BufferId, CachedRenderPipelineId,
+            DynamicUniformBuffer, PipelineCache, ShaderType, SpecializedRenderPipelines,
         },
         renderer::{RenderDevice, RenderQueue},
         texture::Image,
@@ -57,7 +55,7 @@ pub struct ExtractedEguiTextures<'w> {
 
 impl ExtractedEguiTextures<'_> {
     /// Returns an iterator over all textures (both Egui and Bevy managed).
-    pub fn handles(&self) -> impl Iterator<Item = (EguiTextureId, HandleId)> + '_ {
+    pub fn handles(&self) -> impl Iterator<Item = (EguiTextureId, AssetId<Image>)> + '_ {
         self.egui_textures
             .0
             .iter()
@@ -156,14 +154,14 @@ pub fn prepare_egui_transforms_system(
         match egui_transforms.bind_group {
             Some((id, _)) if buffer.id() == id => {}
             _ => {
-                let transform_bind_group = render_device.create_bind_group(&BindGroupDescriptor {
-                    label: Some("egui transform bind group"),
-                    layout: &egui_pipeline.transform_bind_group_layout,
-                    entries: &[BindGroupEntry {
+                let transform_bind_group = render_device.create_bind_group(
+                    Some("egui transform bind group"),
+                    &egui_pipeline.transform_bind_group_layout,
+                    &[BindGroupEntry {
                         binding: 0,
                         resource: egui_transforms.buffer.binding().unwrap(),
                     }],
-                });
+                );
                 egui_transforms.bind_group = Some((buffer.id(), transform_bind_group));
             }
         };
@@ -185,11 +183,11 @@ pub fn queue_bind_groups_system(
     let bind_groups = egui_textures
         .handles()
         .filter_map(|(texture, handle_id)| {
-            let gpu_image = gpu_images.get(&Handle::weak(handle_id))?;
-            let bind_group = render_device.create_bind_group(&BindGroupDescriptor {
-                label: None,
-                layout: &egui_pipeline.texture_bind_group_layout,
-                entries: &[
+            let gpu_image = gpu_images.get(&Handle::Weak(handle_id))?;
+            let bind_group = render_device.create_bind_group(
+                None,
+                &egui_pipeline.texture_bind_group_layout,
+                &[
                     BindGroupEntry {
                         binding: 0,
                         resource: BindingResource::TextureView(&gpu_image.texture_view),
@@ -199,7 +197,7 @@ pub fn queue_bind_groups_system(
                         resource: BindingResource::Sampler(&gpu_image.sampler),
                     },
                 ],
-            });
+            );
             Some((texture, bind_group))
         })
         .collect();
