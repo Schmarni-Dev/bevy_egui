@@ -7,7 +7,7 @@ use bevy::log;
 use bevy::{
     ecs::{
         event::EventWriter,
-        system::{Local, Res, ResMut, SystemParam},
+        system::{Local, Res, ResMut, SystemParam}, query::{With, Or},
     },
     input::{
         keyboard::{KeyCode, KeyboardInput},
@@ -20,7 +20,7 @@ use bevy::{
     window::{
         CursorEntered, CursorLeft, CursorMoved, ReceivedCharacter, RequestRedraw, Window,
         WindowCreated, WindowFocused,
-    },
+    }, asset::Assets, render::texture::Image,
 };
 use std::marker::PhantomData;
 
@@ -382,11 +382,11 @@ pub fn update_contexts_system(
                 window.scale_factor() as f32,
             )
         } else if let Some(EguiRenderToTexture(render_output)) = context.render_to_tex.as_deref() {
-            let render_output = images.get(&render_output).expect(
+            let render_output = images.get(render_output).expect(
                 "should have found an `Image` with the handle stored in `EguiRenderToTexture`",
             );
             let (width, height) = render_output.size().into();
-            WindowSize::new(width, height, 1.)
+            WindowSize::new(width as f32, height as f32, 1.)
         } else {
             unreachable!("All entities in `context_params` should have either a `Window` or a `EguiRenderToTexture` component")
         };
