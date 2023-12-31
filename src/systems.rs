@@ -5,9 +5,11 @@ use crate::{
 #[cfg(feature = "open_url")]
 use bevy::log;
 use bevy::{
+    asset::Assets,
     ecs::{
         event::EventWriter,
-        system::{Local, Res, ResMut, SystemParam}, query::{With, Or},
+        query::{Or, With},
+        system::{Local, Res, ResMut, SystemParam},
     },
     input::{
         keyboard::{KeyCode, KeyboardInput},
@@ -16,11 +18,12 @@ use bevy::{
         ButtonState, Input,
     },
     prelude::{Entity, EventReader, Query, Resource, Time},
+    render::texture::Image,
     time::Real,
     window::{
         CursorEntered, CursorLeft, CursorMoved, ReceivedCharacter, RequestRedraw, Window,
         WindowCreated, WindowFocused,
-    }, asset::Assets, render::texture::Image,
+    },
 };
 use std::marker::PhantomData;
 
@@ -62,8 +65,6 @@ pub struct TouchId(pub Option<u64>);
 #[allow(missing_docs)]
 #[derive(SystemParam)]
 pub struct InputResources<'w, 's> {
-    #[cfg(feature = "manage_clipboard")]
-    pub egui_clipboard: Res<'w, crate::EguiClipboard>,
     pub keyboard_input: Res<'w, Input<KeyCode>>,
     #[system_param(ignore)]
     _marker: PhantomData<&'s ()>,
@@ -439,20 +440,14 @@ pub fn process_output_system(
             platform_output,
             shapes,
             textures_delta,
-            pixels_per_point,
-            viewport_output,
+            repaint_after,
         } = full_output;
-        let paint_jobs = ctx.tessellate(shapes, pixels_per_point);
+        let paint_jobs = ctx.tessellate(shapes);
 
         context.render_output.paint_jobs = paint_jobs;
         context.render_output.textures_delta.append(textures_delta);
 
         context.egui_output.platform_output = platform_output.clone();
-
-        #[cfg(feature = "manage_clipboard")]
-        if !platform_output.copied_text.is_empty() {
-            egui_clipboard.set_contents(&platform_output.copied_text);
-        }
 
         let mut set_icon = || {
             if let Some(window) = context.window.as_mut() {
@@ -472,9 +467,9 @@ pub fn process_output_system(
         #[cfg(not(windows))]
         set_icon();
 
-        if viewport_output.is_empty() {
-            event.send(RequestRedraw)
-        }
+        // if viewport_output.is_empty() {
+        //     event.send(RequestRedraw)
+        // }
 
         #[cfg(feature = "open_url")]
         if let Some(egui::output::OpenUrl { url, new_tab }) = platform_output.open_url {
