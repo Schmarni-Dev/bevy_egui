@@ -458,7 +458,7 @@ pub fn process_output_system(
 
         #[cfg(windows)]
         {
-            let last_cursor_icon = last_cursor_icon.entry(context.window_entity).or_default();
+            let last_cursor_icon = last_cursor_icon.entry(context.entity).or_default();
             if *last_cursor_icon != platform_output.cursor_icon {
                 set_icon();
                 *last_cursor_icon = platform_output.cursor_icon;
