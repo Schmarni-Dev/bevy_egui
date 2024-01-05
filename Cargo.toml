@@ -16,6 +16,7 @@ all-features = true
 [features]
 default = ["default_fonts"]
 immutable_ctx = []
+manage_clipboard = []
 open_url = ["webbrowser"]
 default_fonts = ["egui/default_fonts"]
 serde = ["egui/serde"]
